@@ -1,4 +1,3 @@
-from translate import translate
 import yaml
 import threading
 import webbrowser
@@ -9,6 +8,24 @@ from sys import argv as sys_argv
 from sys import exit as sys_exit
 from PyQt5 import QtCore, QtGui, QtWidgets
 from os import path
+import re
+import html
+from urllib import parse
+import requests
+
+GOOGLE_TRANSLATE_URL = 'http://translate.google.cn/m?q=%s&tl=%s&sl=%s'
+
+def translate(text, to_language="auto", text_language="auto"):
+
+    text = parse.quote(text)
+    url = GOOGLE_TRANSLATE_URL % (text,to_language,text_language)
+    response = requests.get(url)
+    data = response.text
+    expr = r'(?s)class="(?:t0|result-container)">(.*?)<'
+    result = re.findall(expr, data)
+    if (len(result) == 0):
+        return ""
+    return html.unescape(result[0])
 
 def translating(ymlKey:int,yml:dict):
     yml[ymlKey] = translate(yml[ymlKey],"zh-TW")
@@ -47,7 +64,7 @@ def openYmlFile():
 
 class GUI(object):
     def setupUi(self, Form):
-        Form.setObjectName("Form")
+        Form.setObjectName("快速Yml翻譯工具")
         Form.setFixedSize(312, 172)
         self.pushButton = QtWidgets.QPushButton(Form)
         self.pushButton.setGeometry(QtCore.QRect(60, 20, 201, 71))
@@ -86,13 +103,13 @@ class GUI(object):
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "Form"))
+        Form.setWindowTitle(_translate("Form", "快速Yml翻譯工具"))
         self.pushButton.setText(_translate("Form", "開啟yml檔案"))
         self.pushButton.clicked.connect(lambda:openYmlFile())
         self.pushButton_2.setText(_translate("Form", "查看Github原始碼"))
         self.pushButton_2.clicked.connect(lambda:webbrowser.open("http://www.baidu.com"))
         self.pushButton_3.setText(_translate("Form", "支持作者Youtube頻道"))
-        self.pushButton_3.clicked.connect(lambda:webbrowser.open("http://www.baidu.com"))
+        self.pushButton_3.clicked.connect(lambda:webbrowser.open("https://www.youtube.com/channel/UCoIyvDVUbE-9g6A7AtL7aBQ"))
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys_argv)
