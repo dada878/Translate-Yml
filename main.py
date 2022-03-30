@@ -59,7 +59,7 @@ def openYmlFile():
 
     ymlText = yaml.dump(yml,allow_unicode=True)
     
-    with open(path.basename(file_path)[:-4]+"(translate).yml","w",encoding="UTF8") as f:
+    with open(file_path[:-4]+"(translate).yml","w",encoding="UTF8") as f:
         f.write(ymlText)
 
 class GUI(object):
@@ -107,7 +107,7 @@ class GUI(object):
         self.pushButton.setText(_translate("Form", "開啟yml檔案"))
         self.pushButton.clicked.connect(lambda:openYmlFile())
         self.pushButton_2.setText(_translate("Form", "查看Github原始碼"))
-        self.pushButton_2.clicked.connect(lambda:webbrowser.open("http://www.baidu.com"))
+        self.pushButton_2.clicked.connect(lambda:webbrowser.open("https://github.com/dada909090/Translate-Yml"))
         self.pushButton_3.setText(_translate("Form", "支持作者Youtube頻道"))
         self.pushButton_3.clicked.connect(lambda:webbrowser.open("https://www.youtube.com/channel/UCoIyvDVUbE-9g6A7AtL7aBQ"))
 
