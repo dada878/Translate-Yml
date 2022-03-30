@@ -1,0 +1,8 @@
+gui.py
+.vscode
+__pycache__
+messages(translate).yml
+messages.yml
+test.py
+translate.py
+translateYml.ui
