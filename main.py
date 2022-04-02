@@ -13,10 +13,11 @@ import html
 from urllib import parse
 import requests
 
-GOOGLE_TRANSLATE_URL = 'http://translate.google.cn/m?q=%s&tl=%s&sl=%s'
+yml = {}
 
 def translate(text, to_language="auto", text_language="auto"):
-
+    # 此串接google翻譯api函式來源https://www.perfcode.com/p/Python-calls-google-translate-api.html
+    GOOGLE_TRANSLATE_URL = 'http://translate.google.cn/m?q=%s&tl=%s&sl=%s'
     text = parse.quote(text)
     url = GOOGLE_TRANSLATE_URL % (text,to_language,text_language)
     response = requests.get(url)
@@ -27,8 +28,8 @@ def translate(text, to_language="auto", text_language="auto"):
         return ""
     return html.unescape(result[0])
 
-def translating(ymlKey:int,yml:dict):
-    yml[ymlKey] = translate(yml[ymlKey],"zh-TW")
+def translating(target:any, setValue:any):
+    yml[target] = translate(yml[target],"zh-TW")
     value = ui.getBarValue()
     ui.setBarValue(value + 100/len(yml))
 
@@ -37,12 +38,14 @@ def selectFile():
     root.withdraw()
     file_path = filedialog.askopenfilename()
     if not file_path.endswith(".yml"):
-        messagebox.showinfo("錯誤", "未知的檔案格式")
+        messagebox.showerror("錯誤", "未知的檔案格式")
         selectFile()
     
     return file_path
 
 def openYmlFile():
+    global yml
+
     file_path = selectFile()
 
     with open(file_path,"r",encoding="UTF8") as f:
@@ -51,11 +54,23 @@ def openYmlFile():
     threads = []
 
     for i in yml:
-        threads.append(threading.Thread(target=translating, args=(i,yml)))
-        threads[len(threads)-1].start()
+        # if type(yml[i]) == dict:
+        #     for j in yml[i]:
+        #         print(j)
+        #         print(yml[i][j])
+        #         threads.append(threading.Thread(target=translating, args=(yml[i][j],yml[i])))
+        # if type(yml[i]) == list:
+        #     for j in yml[i]:
+        #         threads.append(threading.Thread(target=translating, args=(yml[i][j],yml[i])))
+        if type(yml[i]) == str:
+            threads.append(threading.Thread(target=translating, args=(i,yml)))
+            threads[len(threads)-1].start()
 
     for i in threads:
         threads[len(threads)-1].join()
+    
+    ui.setBarValue(100)
+    messagebox.showinfo("提示","翻譯完成！")
 
     ymlText = yaml.dump(yml,allow_unicode=True)
     
@@ -99,7 +114,7 @@ class GUI(object):
         self.progressBar.setProperty("value", value)
 
     def getBarValue(self):
-        return self.progressBar.value()
+        return self.progressBar.value()  
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
